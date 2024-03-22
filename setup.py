@@ -18,8 +18,8 @@ setup(
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/adrian-alejandro/anonymize-df",
-    author="Adrián Zelaya",
-    author_email="zelaya.adrian@gmail.com",
+    author="Adrián Zelaya, Alexander Fridriksson",
+    author_email="zelaya.adrian@gmail.com, post@alexanderfridriksson.com",
     license="BSD",
     classifiers=[
         "License :: OSI Approved :: BSD License",
