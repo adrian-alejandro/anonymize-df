@@ -2,11 +2,8 @@ import random
 
 from faker import Faker
 
-# select localisation for fake data
-fake = Faker("en_GB")
 
-
-class anonymize(object):
+class Anonymize(object):
     """Initializes a Pandas DataFrame as an anonymize object
     to be used for making fake data.
 
@@ -17,12 +14,13 @@ class anonymize(object):
         anonymize object
     """
 
-    def __init__(self, df):
+    def __init__(self, df, locale="en_GB"):
 
         if df.__class__.__name__ != "DataFrame":
             raise Exception(f"{df} is not a pandas DataFrame.")
 
         self._df = df
+        self._fake = Faker(locale)
 
     def fake_names(self, original_name, chaining=False):
 
@@ -39,16 +37,16 @@ class anonymize(object):
         """
 
         # you might be wondering why this if statement (and others like it) are here
-        # its because this is required as a "None" value by interface tools
+        # it's because this is required as a "None" value by interface tools
         # one example being the Alteryx interface designer
-        if original_name == []:
+        if not original_name:
             print("No name column selected")
             return self
         else:
 
             unique_names = self._df[original_name].unique()
 
-            name_dict = {name: fake.name() for name in unique_names}
+            name_dict = {name: self._fake.name() for name in unique_names}
 
             self._df[f"Fake_{original_name}"] = [
                 name_dict[name] for name in self._df[original_name]
@@ -72,14 +70,14 @@ class anonymize(object):
             or anonymize object if chaining is true
         """
 
-        if original_id == []:
+        if not original_id:
             print("No id column selected")
             return self
         else:
 
             unique_ids = self._df[original_id].unique()
 
-            id_dict = {id_: fake.bban() for id_ in unique_ids}
+            id_dict = {id_: self._fake.bban() for id_ in unique_ids}
 
             self._df[f"Fake_{original_id}"] = [
                 id_dict[id_] for id_ in self._df[original_id]
@@ -99,13 +97,14 @@ class anonymize(object):
         Args:
             original_whole_number: number column for generating fake numbers
             chaining: set to true if you want to do method chaining
+            group_by: column on which to group_by
 
         Returns:
             Pandas DataFrame if chaining is false (default)
             or anonymize object if chaining is true
         """
 
-        if original_whole_number == []:
+        if not original_whole_number:
             print("No whole number column selected")
             return self
         else:
@@ -126,7 +125,7 @@ class anonymize(object):
 
                 for i in range(len(grouped_numbers[group_by])):
                     whole_number_dict_part = {
-                        number: fake.random_int(
+                        number: self._fake.random_int(
                             min=grouped_numbers["min"][i], max=grouped_numbers["max"][i]
                         )
                         for number in dff[
@@ -138,7 +137,7 @@ class anonymize(object):
                 whole_numbers = self._df[original_whole_number]
 
                 whole_number_dict = {
-                    number: fake.random_int(
+                    number: self._fake.random_int(
                         min=min(whole_numbers), max=max(whole_numbers)
                     )
                     for number in whole_numbers
@@ -164,13 +163,14 @@ class anonymize(object):
         Args:
             original_decimal_number: number column for generating fake numbers
             chaining: set to true if you want to do method chaining
+            group_by: column on which to group_by
 
         Returns:
             Pandas DataFrame if chaining is false (default)
             or anonymize object if chaining is true
         """
 
-        if original_decimal_number == []:
+        if not original_decimal_number:
             print("No decimal number column selected")
             return self
         else:
@@ -225,7 +225,7 @@ class anonymize(object):
     def fake_dates(self, original_date, chaining=False):
 
         """Generates as many dates as there are in the original_date column.
-        Currently doesn't sample the min or max date range but rather
+        Currently, doesn't sample the min or max date range but rather
         generates a date string between January 1, 1970 and now.
 
         Args:
@@ -237,14 +237,14 @@ class anonymize(object):
             or anonymize object if chaining is true
         """
 
-        if original_date == []:
+        if not original_date:
             print("No date column selected")
             return self
         else:
 
             dates = self._df[original_date]
 
-            date_dict = {date: fake.date() for date in dates}
+            date_dict = {date: self._fake.date() for date in dates}
 
             self._df[f"Fake_{original_date}"] = [
                 date_dict[date] for date in self._df[original_date]
@@ -260,7 +260,7 @@ class anonymize(object):
         """Generates as many fake categories as there are unique
         categories in the original_category column.
 
-        Currently takes the name of the category column and increments it
+        Currently, takes the name of the category column and increments it
         ex. segment 1, segment 2 if there are two unique values
         in a category column called segment.
 
@@ -273,7 +273,7 @@ class anonymize(object):
             or anonymize object if chaining is true
         """
 
-        if original_category == []:
+        if not original_category:
             print("No category column selected")
             return self
         else:
