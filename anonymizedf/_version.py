@@ -42,8 +42,8 @@ def get_config():
     cfg.VCS = "git"
     cfg.style = "pep440"
     cfg.tag_prefix = "v"
-    cfg.parentdir_prefix = "anonymizedf-"
-    cfg.versionfile_source = "anonymizedf/_version.py"
+    cfg.parentdir_prefix = "anonymize-df-"
+    cfg.versionfile_source = "anonymize-df/_version.py"
     cfg.verbose = False
     return cfg
 

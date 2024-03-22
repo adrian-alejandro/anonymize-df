@@ -1,2 +1,2 @@
 include versioneer.py
-include anonymizedf/_version.py
+include anonymize-df/_version.py
