@@ -1,5 +1,4 @@
 import random
-
 from faker import Faker
 
 
@@ -22,7 +21,7 @@ class Anonymize(object):
         self._df = df
         self._fake = Faker(locale)
 
-    def fake_names(self, original_name, chaining=False):
+    def fake_names(self, original_name, gender_col=None, genders=None, chaining=False):
 
         """Generates as many fake names as there are unique
         names in the original_name column.
@@ -30,6 +29,8 @@ class Anonymize(object):
         Args:
             original_name: name column for generating fake names
             chaining: set to true if you want to do method chaining
+            gender_col: gender column so to generate gender-specific fake names
+            genders: list of genders, first element should correspond to the dataset's equivalent of 'male'
 
         Returns:
             Pandas DataFrame if chaining is false (default)
@@ -44,9 +45,31 @@ class Anonymize(object):
             return self
         else:
 
-            unique_names = self._df[original_name].unique()
+            if gender_col is not None:
 
-            name_dict = {name: self._fake.name() for name in unique_names}
+                grouped_names = (
+                    self._df.groupby(gender_col)[original_name]
+                    .agg(['unique'])
+                    .reset_index()
+                )
+
+                # just for dev purpose now to check if it ran
+                print(f"Grouped by {gender_col}")
+
+                name_dict = {}
+
+                for i, gender in enumerate(grouped_names[gender_col]):
+                    gender_name_dict = {
+                        name: self._fake.name_male()
+                        if gender == genders[0] else self._fake.name_female()
+                        for name in grouped_names['unique'][i]
+                    }
+                    name_dict.update(gender_name_dict)
+            else:
+
+                unique_names = self._df[original_name].unique()
+
+                name_dict = {name: self._fake.name() for name in unique_names}
 
             self._df[f"Fake_{original_name}"] = [
                 name_dict[name] for name in self._df[original_name]
